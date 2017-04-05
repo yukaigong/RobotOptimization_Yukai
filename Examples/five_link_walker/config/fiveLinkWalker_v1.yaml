@@ -1,0 +1,30 @@
+# specify optimization options here
+options:
+- IntegrationScheme: 'Trapezoidal' # (Trapezoidal, HermiteSimpson)
+
+# specify domain names and number of nodes
+domains:
+- name: RightStance
+  numNodes: 29
+
+# value limits of optimization variables or constraints
+boundaries:
+- domain1:
+    minJointAngles: [-10, 0.5, 0, 2, 0.5, 2, 0.5]
+    maxJointAngles: [10, 2, 1, 5, 2, 5, 2]
+    minJointVelocities: [-20, -20, -20, -20, -20, -20, -20]
+    maxJointVelocities: [20, 20, 20, 20, 20,  20, 20]
+    minJointAccel: [-100,-100,-100,-100,-100,-100,-100]
+    maxJointAccel: [100,100,100,100,100,100,100]
+    minTorqueLimit: [-100,-100,-100,-100]
+    maxTorqueLimit: [100,100,100,100]
+    minConstrForces: [-1000,-1000]
+    maxConstrForces: [1000,1000]
+    minImpactForces: [0,0]
+    maxImpactForces: [10,10]
+    minTimeInterval: 0.25
+    maxTimeInterval: 0.75
+    minAlpha: [-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10,-10]
+    maxAlpha: [10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10]
+    minHolonomicConstraint: [-10,-10]
+    maxHolonomicConstraint: [10,10]

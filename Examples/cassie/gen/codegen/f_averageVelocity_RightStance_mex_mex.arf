@@ -1,0 +1,10 @@
+libemlrt.lib
+libcovrt.lib
+libut.lib
+libmwmathutil.lib
+/export:mexFunction
+/export:emlrtMexFcnProperties
+/export:f_averageVelocity_RightStance
+/export:f_averageVelocity_RightStance_initialize
+/export:f_averageVelocity_RightStance_terminate
+/export:f_averageVelocity_RightStance_atexit

@@ -1,0 +1,10 @@
+libemlrt.lib
+libcovrt.lib
+libut.lib
+libmwmathutil.lib
+/export:mexFunction
+/export:emlrtMexFcnProperties
+/export:f_yaw_LeftStance
+/export:f_yaw_LeftStance_initialize
+/export:f_yaw_LeftStance_terminate
+/export:f_yaw_LeftStance_atexit

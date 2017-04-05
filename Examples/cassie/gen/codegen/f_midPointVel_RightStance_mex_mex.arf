@@ -1,0 +1,10 @@
+libemlrt.lib
+libcovrt.lib
+libut.lib
+libmwmathutil.lib
+/export:mexFunction
+/export:emlrtMexFcnProperties
+/export:f_midPointVel_RightStance
+/export:f_midPointVel_RightStance_initialize
+/export:f_midPointVel_RightStance_terminate
+/export:f_midPointVel_RightStance_atexit

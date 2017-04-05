@@ -1,0 +1,10 @@
+libemlrt.lib
+libcovrt.lib
+libut.lib
+libmwmathutil.lib
+/export:mexFunction
+/export:emlrtMexFcnProperties
+/export:f_timeCont_LeftStance
+/export:f_timeCont_LeftStance_initialize
+/export:f_timeCont_LeftStance_terminate
+/export:f_timeCont_LeftStance_atexit

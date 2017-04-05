@@ -1,0 +1,10 @@
+libemlrt.lib
+libcovrt.lib
+libut.lib
+libmwmathutil.lib
+/export:mexFunction
+/export:emlrtMexFcnProperties
+/export:f_holConstrExternalForce_fourbar
+/export:f_holConstrExternalForce_fourbar_initialize
+/export:f_holConstrExternalForce_fourbar_terminate
+/export:f_holConstrExternalForce_fourbar_atexit

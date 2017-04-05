@@ -1,0 +1,10 @@
+libemlrt.lib
+libcovrt.lib
+libut.lib
+libmwmathutil.lib
+/export:mexFunction
+/export:emlrtMexFcnProperties
+/export:J_h0_RightStance
+/export:J_h0_RightStance_initialize
+/export:J_h0_RightStance_terminate
+/export:J_h0_RightStance_atexit

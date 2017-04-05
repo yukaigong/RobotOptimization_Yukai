@@ -1,0 +1,10 @@
+libemlrt.lib
+libcovrt.lib
+libut.lib
+libmwmathutil.lib
+/export:mexFunction
+/export:emlrtMexFcnProperties
+/export:J_holConstrPosition_fixed
+/export:J_holConstrPosition_fixed_initialize
+/export:J_holConstrPosition_fixed_terminate
+/export:J_holConstrPosition_fixed_atexit

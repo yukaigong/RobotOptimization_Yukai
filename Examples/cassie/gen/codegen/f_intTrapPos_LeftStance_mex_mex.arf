@@ -1,0 +1,10 @@
+libemlrt.lib
+libcovrt.lib
+libut.lib
+libmwmathutil.lib
+/export:mexFunction
+/export:emlrtMexFcnProperties
+/export:f_intTrapPos_LeftStance
+/export:f_intTrapPos_LeftStance_initialize
+/export:f_intTrapPos_LeftStance_terminate
+/export:f_intTrapPos_LeftStance_atexit

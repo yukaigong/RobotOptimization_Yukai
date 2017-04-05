@@ -1,0 +1,10 @@
+libemlrt.lib
+libcovrt.lib
+libut.lib
+libmwmathutil.lib
+/export:mexFunction
+/export:emlrtMexFcnProperties
+/export:J_holConstrAcceleration_fourbar
+/export:J_holConstrAcceleration_fourbar_initialize
+/export:J_holConstrAcceleration_fourbar_terminate
+/export:J_holConstrAcceleration_fourbar_atexit
