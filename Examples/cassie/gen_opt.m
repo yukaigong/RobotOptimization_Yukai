@@ -1,9 +1,9 @@
 tic
 % Set paths
 restoredefaultpath
-addpath(genpath('..\..\..\..\Model-Generator\utils'))
+addpath(genpath('..\..\..\Model-Generator\utils'))
 model_name = 'cassie';
-addpath(genpath(['..\..\..\..\Model-Generator\models\', model_name]));
+addpath(genpath(['..\..\..\Model-Generator\models\', model_name]));
 addpath('gen_opt_functions')
 OPT_PATH = 'gen/';
 

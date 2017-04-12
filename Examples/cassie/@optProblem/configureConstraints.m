@@ -128,7 +128,7 @@ function [obj] = configureConstraints(obj, varargin)
             'GRF',2,1:domain.nNode,{{'Fe'}},-Inf,0,mu);
         
         % Average Step Velocity
-        velocity = [0.0,0,0];
+        velocity = [0,0,0];
         selected = [1,1,0];
         extra = [velocity, selected];
         deps_1 = domain.optVarIndices.q(1,:);

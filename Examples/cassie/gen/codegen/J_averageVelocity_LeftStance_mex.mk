@@ -1,4 +1,4 @@
-START_DIR = D:\Graduate\robots\GitHub\ROBOTO~1\Examples\cassie\gen\mex
+START_DIR = D:\Graduate\robots\GitHub\ROBOTO~2\Examples\cassie\gen\mex
 
 MATLAB_ROOT = G:\MATLAB\R2016a
 MAKEFILE = J_averageVelocity_LeftStance_mex.mk
@@ -55,7 +55,7 @@ SYS_INCLUDE = $(MATLAB_INCLUDES)
 # Additional includes
 
 SYS_INCLUDE += /I "$(START_DIR)"
-SYS_INCLUDE += /I "D:\Graduate\robots\GitHub\RobotOptimization\Examples\cassie\gen\codegen"
+SYS_INCLUDE += /I "D:\Graduate\robots\GitHub\RobotOptimization_Yukai\Examples\cassie\gen\codegen"
 SYS_INCLUDE += /I ".\interface"
 SYS_INCLUDE += /I "$(MATLAB_ROOT)\extern\include"
 SYS_INCLUDE += /I "."
@@ -89,7 +89,7 @@ CPPFLAGS =  $(CFLAGS)
 %.$(OBJEXT) : $(START_DIR)/%.c
 	$(CC) $(CFLAGS) "$<"
 
-%.$(OBJEXT) : D:\Graduate\robots\GitHub\RobotOptimization\Examples\cassie\gen\codegen/%.c
+%.$(OBJEXT) : D:\Graduate\robots\GitHub\RobotOptimization_Yukai\Examples\cassie\gen\codegen/%.c
 	$(CC) $(CFLAGS) "$<"
 
 %.$(OBJEXT) : interface/%.c
@@ -100,7 +100,7 @@ CPPFLAGS =  $(CFLAGS)
 %.$(OBJEXT) : $(START_DIR)/%.cpp
 	$(CC) $(CPPFLAGS) "$<"
 
-%.$(OBJEXT) : D:\Graduate\robots\GitHub\RobotOptimization\Examples\cassie\gen\codegen/%.cpp
+%.$(OBJEXT) : D:\Graduate\robots\GitHub\RobotOptimization_Yukai\Examples\cassie\gen\codegen/%.cpp
 	$(CC) $(CPPFLAGS) "$<"
 
 %.$(OBJEXT) : interface/%.cpp
