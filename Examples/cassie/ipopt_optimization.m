@@ -28,6 +28,7 @@ opt = configureObjective(opt);
 
 % Get Initial Condition
 x0 = opt.Z0;
+old = load('02ms_1'); x0 = old.x;% + 0.01*rand(size(old.x));
 
 %% Solve Optimization Problem
 debugMode = false;
