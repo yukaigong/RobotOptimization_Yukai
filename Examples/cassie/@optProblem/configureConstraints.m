@@ -35,6 +35,13 @@ function [obj] = configureConstraints(obj, varargin)
     RightStance = addConstraint(RightStance,'Inter-Domain-Nonlinear',...
         'aSymmetrySelected',DOA*(M+1),RightStance.nNode,...
         {deps_1,deps_2},-5e-4,5e-4,selected);
+    
+    % Step Time Continuity
+    deps_1 = RightStance.optVarIndices.t(end,:);
+    deps_2 = LeftStance.optVarIndices.t(1,:);
+    RightStance = addConstraint(RightStance,'Inter-Domain-Nonlinear',...
+        'timeCont',1,RightStance.nNode,...
+        {deps_1,deps_2},-5e-4,5e-4);
         
     %% Left Stance
     
@@ -47,6 +54,13 @@ function [obj] = configureConstraints(obj, varargin)
     deps_2 = LeftStance.optVarIndices.dq(1,:);
     LeftStance = addConstraint(LeftStance,'Inter-Domain-Nonlinear',...
         'qCont',DOF,1,{deps_1,deps_2},-5e-4,5e-4);
+    % make the roll angle of left and right stance to be symmetric (instead
+    % of leaning left or right)
+    deps_1 = LeftStance.optVarIndices.q(1,:);
+    deps_2 = RightStance.optVarIndices.q(1,:);
+    LeftStance = addConstraint(LeftStance,'Inter-Domain-Nonlinear',...
+        'rollsym',1,LeftStance.nNode,{deps_1,deps_2},-5e-4,5e-4);
+
     
     % Periodicity
     selected = ones(1,DOF); selected(1:3) = 0; 
@@ -128,7 +142,6 @@ function [obj] = configureConstraints(obj, varargin)
             'GRF',2,1:domain.nNode,{{'Fe'}},-Inf,0,mu);
         
         % Average Step Velocity
-        velocity = [0,0,0];
         selected = [1,1,0];
         extra = [velocity, selected];
         deps_1 = domain.optVarIndices.q(1,:);
@@ -145,7 +158,7 @@ function [obj] = configureConstraints(obj, varargin)
         deps_2 = domain.optVarIndices.pFoot(ceil(end/2),:);
         deps_3 = domain.optVarIndices.pFoot(end,:);
         domain = addConstraint(domain,'Inter-Domain-Nonlinear',...
-            'halfwayStepLength',3,domain.nNode,{deps_1,deps_2,deps_3},-1e-2,1e-2,extra);
+            'halfwayStepLength',3,domain.nNode,{deps_1,deps_2,deps_3},-1e-1,1e-1,extra);
 
         % Swing Foot Retraction - y
         selected = [1,0,0];

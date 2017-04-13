@@ -28,7 +28,6 @@ opt = configureObjective(opt);
 
 % Get Initial Condition
 x0 = opt.Z0;
-old = load('x0'); x0 = old.x;% + 0.01*rand(size(old.x));
 
 %% Solve Optimization Problem
 debugMode = false;
@@ -93,7 +92,7 @@ toc
 
 %% Animation
 positions_function = @positions;
-t_log = [linspace(0,outputs{1}.t(end),length(outputs{1}.t)), outputs{1}.t(end) + linspace(0,outputs{1}.t(end),length(outputs{2}.t))];
+t_log = [linspace(0,outputs{1}.t(end),length(outputs{1}.t)), outputs{1}.t(end) + linspace(0,outputs{2}.t(end),length(outputs{2}.t))];
 q_log = [outputs{1}.q;outputs{2}.q]';
 
 f = figure;

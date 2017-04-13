@@ -13,6 +13,7 @@ DOA = 10;
 M = 5;
 nOutputs = 10;
 nHolonomicConstraints = 12;
+nnode=29;
 actuatedIndices = [8,9,10,11,14,16,17,18,19,22];
 q = sym('q',[DOF,1]);
 dq = sym('dq',[DOF,1]);
@@ -140,6 +141,21 @@ virtual_constraints(DOF, outputs_sym, M, OPT_PATH, 'LeftStance');
 disp('Generating physical constraints ...')
 physical_constraints(DOF, OPT_PATH, 'RightStance');
 physical_constraints(DOF, OPT_PATH, 'LeftStance');
+
+%% Roll Symmetric Constraints
+disp('Generating roll symmetric Constraints')
+
+q1 = sym('q1_',[DOF,1]);
+q2 = sym('q2_',[DOF,1]);
+selected=zeros(1,DOF);
+selected(4)=1;
+constraint=selected*(q1+q2);
+vars = [q1;q2].';
+J_constraint = jacobian(constraint,vars);
+symbolicToFunction(['f_rollsym_RightStance'], {vars}, {constraint}, OPT_PATH)
+symbolicToFunction(['J_rollsym_RightStance'], {vars}, {J_constraint}, OPT_PATH)
+symbolicToFunction(['f_rollsym_LeftStance'], {vars}, {constraint}, OPT_PATH)
+symbolicToFunction(['J_rollsym_LeftStance'], {vars}, {J_constraint}, OPT_PATH)
 
 %% Costs
 disp('Generating torque costs ...')
