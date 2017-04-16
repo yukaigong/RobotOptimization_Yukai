@@ -9,61 +9,55 @@ function [obj] = configureConstraints(obj, varargin)
     DOA = 10;  % Degrees of Actuation
     M = 5;     % Bezier degree
     NHC = 12;  % Number of holonomic constraints
+
+    domains = obj.domains;
     
-    %% Unique Contraints 
     
-    % Store useful domain names
-    RightStance = obj.domains{1};
-    LeftStance = obj.domains{2};
     
     %% begin at perturbed velocity, end at desired velocity.
     load('02ms_1.mat')
     x_0   = [outputs{1}.q(1,1:22), outputs{1}.dq(1,1:22)]';
     load('0ms_1.mat')
-    x_end = [outputs{2}.q(end,1:22), outputs{2}.dq(end,1:22)]';
+    x_end = [outputs{1}.q(end,1:22), outputs{1}.dq(end,1:22)]';
     
     selected=ones(2*DOF,1);
     extra=[selected;x_0]';
-    RightStance = addConstraint(RightStance,'Nonlinear-Equality',...
+    domains{1} = addConstraint(domains{1},'Nonlinear-Equality',...
         'xConstrainExternal',2*DOF,1,{{'q','dq'}},-5e-4,5e-4,extra);
     selected=ones(2*DOF,1);selected([1,2,3])=0;
     extra=[selected;x_end]';
-    LeftStance = addConstraint(LeftStance,'Nonlinear-Equality',...
-        'xConstrainExternal',2*DOF,LeftStance.nNode,{{'q','dq'}},-5e-4,5e-4,extra);
+    domains{obj.nDomain} = addConstraint(domains{obj.nDomain},'Nonlinear-Equality',...
+        'xConstrainExternal',2*DOF,domains{obj.nDomain}.nNode,{{'q','dq'}},-5e-4,5e-4,extra);
 
     %% Right Stance
     
     % Initialize h to 0
     h0_des = zeros(1,NHC);
-    RightStance = addConstraint(RightStance,'Nonlinear-Equality',...
+    domains{1} = addConstraint(domains{1},'Nonlinear-Equality',...
         'h0', NHC, 1, {{'h'}},-5e-4,5e-4,h0_des);
     
     % Initialize yaw to 0
     yaw_des = 0;
-    RightStance = addConstraint(RightStance,'Nonlinear-Equality',...
+    domains{1} = addConstraint(domains{1},'Nonlinear-Equality',...
         'yaw', 1, 1, {{'q'}},-5e-4,5e-4,yaw_des);
     
         
-    %% Left Stance
     
-    % connect domains together
-    deps_1 = RightStance.optVarIndices.qend(end,:);
-    deps_2 = LeftStance.optVarIndices.q(1,:);
-    LeftStance = addConstraint(LeftStance,'Inter-Domain-Nonlinear',...
-        'qCont',DOF,1,{deps_1,deps_2},-5e-4,5e-4);
-    deps_1 = RightStance.optVarIndices.dqend(end,:);
-    deps_2 = LeftStance.optVarIndices.dq(1,:);
-    LeftStance = addConstraint(LeftStance,'Inter-Domain-Nonlinear',...
-        'qCont',DOF,1,{deps_1,deps_2},-5e-4,5e-4);
+    %% connect domains together
+    for i=1:obj.nDomain-1
+        deps_1 = domains{i}.optVarIndices.qend(end,:);
+        deps_2 = domains{i+1}.optVarIndices.q(1,:);
+        domains{2} = addConstraint(domains{2},'Inter-Domain-Nonlinear',...
+            'qCont',DOF,1,{deps_1,deps_2},-5e-4,5e-4);
+        deps_1 = domains{i}.optVarIndices.dqend(end,:);
+        deps_2 = domains{i+1}.optVarIndices.dq(1,:);
+        domains{2} = addConstraint(domains{2},'Inter-Domain-Nonlinear',...
+            'qCont',DOF,1,{deps_1,deps_2},-5e-4,5e-4);
+    end
 
-    
-    %% Store the modified domains back into the original variables
-    obj.domains{1} = RightStance;
-    obj.domains{2} = LeftStance;
-    
     % register constraints
     for i=1:obj.nDomain
-        domain = obj.domains{i};
+        domain = domains{i};
         
         %% Dynamics
         
@@ -259,9 +253,11 @@ function [obj] = configureConstraints(obj, varargin)
 
         obj.nzmaxConstr= obj.nzmaxConstr + domain.nzmaxConstr;
         
-        obj.domains{i} = domain;
+        domains{i} = domain;
 
     end
+    
+    obj.domains = domains;
     
     obj.constrArray = vertcat(constraints{:});
     nConstr = numel(obj.constrArray);
