@@ -15,6 +15,21 @@ function [obj] = configureConstraints(obj, varargin)
     % Store useful domain names
     RightStance = obj.domains{1};
     LeftStance = obj.domains{2};
+    
+    %% begin at perturbed velocity, end at desired velocity.
+    load('02ms_1.mat')
+    x_0   = [outputs{1}.q(1,1:22), outputs{1}.dq(1,1:22)]';
+    load('0ms_1.mat')
+    x_end = [outputs{2}.q(end,1:22), outputs{2}.dq(end,1:22)]';
+    
+    selected=ones(2*DOF,1);
+    extra=[selected;x_0]';
+    RightStance = addConstraint(RightStance,'Nonlinear-Equality',...
+        'xConstrainExternal',2*DOF,1,{{'q','dq'}},-5e-4,5e-4,extra);
+    selected=ones(2*DOF,1);selected([1,2,3])=0;
+    extra=[selected;x_end]';
+    LeftStance = addConstraint(LeftStance,'Nonlinear-Equality',...
+        'xConstrainExternal',2*DOF,LeftStance.nNode,{{'q','dq'}},-5e-4,5e-4,extra);
 
     %% Right Stance
     
@@ -28,24 +43,10 @@ function [obj] = configureConstraints(obj, varargin)
     RightStance = addConstraint(RightStance,'Nonlinear-Equality',...
         'yaw', 1, 1, {{'q'}},-5e-4,5e-4,yaw_des);
     
-    % Bezier Symmetry
-    selected = ones(1,DOA);
-    deps_1 = RightStance.optVarIndices.a(end,:);
-    deps_2 = LeftStance.optVarIndices.a(1,:);
-    RightStance = addConstraint(RightStance,'Inter-Domain-Nonlinear',...
-        'aSymmetrySelected',DOA*(M+1),RightStance.nNode,...
-        {deps_1,deps_2},-5e-4,5e-4,selected);
-    
-    % Step Time Continuity
-    deps_1 = RightStance.optVarIndices.t(end,:);
-    deps_2 = LeftStance.optVarIndices.t(1,:);
-    RightStance = addConstraint(RightStance,'Inter-Domain-Nonlinear',...
-        'timeCont',1,RightStance.nNode,...
-        {deps_1,deps_2},-5e-4,5e-4);
         
     %% Left Stance
     
-    % Initialize state
+    % connect domains together
     deps_1 = RightStance.optVarIndices.qend(end,:);
     deps_2 = LeftStance.optVarIndices.q(1,:);
     LeftStance = addConstraint(LeftStance,'Inter-Domain-Nonlinear',...
@@ -54,26 +55,8 @@ function [obj] = configureConstraints(obj, varargin)
     deps_2 = LeftStance.optVarIndices.dq(1,:);
     LeftStance = addConstraint(LeftStance,'Inter-Domain-Nonlinear',...
         'qCont',DOF,1,{deps_1,deps_2},-5e-4,5e-4);
-    % make the roll angle of left and right stance to be symmetric (instead
-    % of leaning left or right)
-%     deps_1 = LeftStance.optVarIndices.q(1,4);
-%     deps_2 = RightStance.optVarIndices.q(1,4);
-%     LeftStance = addConstraint(LeftStance,'Inter-Domain-Nonlinear',...
-%         'rollsym',1,LeftStance.nNode,{deps_1,deps_2},-5e-4,5e-4);
 
     
-    % Periodicity
-    selected = ones(1,DOF); selected(1:3) = 0; 
-    deps_1 = LeftStance.optVarIndices.qend(end,:);
-    deps_2 = RightStance.optVarIndices.q(1,:);
-    LeftStance = addConstraint(LeftStance,'Inter-Domain-Nonlinear',...
-        'qContSelected',DOF,1,{deps_1,deps_2},-5e-4,5e-4,selected);
-    selected = ones(1,DOF); 
-    deps_1 = LeftStance.optVarIndices.dqend(end,:);
-    deps_2 = RightStance.optVarIndices.dq(1,:);
-    LeftStance = addConstraint(LeftStance,'Inter-Domain-Nonlinear',...
-        'qContSelected',DOF,1,{deps_1,deps_2},-5e-4,5e-4,selected);
-
     %% Store the modified domains back into the original variables
     obj.domains{1} = RightStance;
     obj.domains{2} = LeftStance;
@@ -140,17 +123,6 @@ function [obj] = configureConstraints(obj, varargin)
         mu = 0.7;
         domain = addConstraint(domain,'Nonlinear-Inequality',...
             'GRF',2,1:domain.nNode,{{'Fe'}},-Inf,0,mu);
-        
-        % Average Step Velocity
-        velocity = [0.2,0,0];
-        selected = [1,1,0];
-        extra = [velocity, selected];
-        deps_1 = domain.optVarIndices.q(1,:);
-        deps_2 = domain.optVarIndices.qend(end,:);
-        deps_3 = domain.optVarIndices.t(end,:);
-        domain = addConstraint(domain,'Inter-Domain-Nonlinear',...
-            'averageVelocity',3,domain.nNode,...
-            {deps_1,deps_2,deps_3},-5e-4,5e-4,extra);
 
         % 2 * Mid step length ==  step length (helps keep the leg angles from moving for no reason)
         selected = [1, 1, 0];
@@ -162,14 +134,14 @@ function [obj] = configureConstraints(obj, varargin)
             'halfwayStepLength',3,domain.nNode,{deps_1,deps_2,deps_3},-1e-1,1e-1,extra);
 
         % Swing Foot velocity
-        selected = [1,0,0];
-        if velocity(1) > 0
-            domain = addConstraint(domain,'Nonlinear-Inequality',...
-                'swingFootVelocity',3,domain.nNode-2:domain.nNode,{{'vFoot'}},-5,0,selected);
-        elseif velocity(1) < 0
-            domain = addConstraint(domain,'Nonlinear-Inequality',...
-                'swingFootVelocity',3,domain.nNode-2:domain.nNode,{{'vFoot'}},0,5,selected);
-        end
+%         selected = [1,0,0];
+%         if velocity(1) > 0
+%             domain = addConstraint(domain,'Nonlinear-Inequality',...
+%                 'swingFootVelocity',3,domain.nNode-2:domain.nNode,{{'vFoot'}},-5,0,selected);
+%         elseif velocity(1) < 0
+%             domain = addConstraint(domain,'Nonlinear-Inequality',...
+%                 'swingFootVelocity',3,domain.nNode-2:domain.nNode,{{'vFoot'}},0,5,selected);
+%         end
         
         % Base to stanceFoot height (we don't want knees extended too much)
         domain = addConstraint(domain,'Nonlinear-Inequality',...
