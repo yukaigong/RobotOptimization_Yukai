@@ -64,6 +64,27 @@
         
         for i=1:obj.nDomain
             domain = domains{i};
+            % Average Step Velocity
+            velocity = [0.2,0,0];
+            selected = [1,1,0];
+            extra = [velocity, selected];
+            deps_1 = domain.optVarIndices.q(1,:);
+            deps_2 = domain.optVarIndices.qend(end,:);
+            deps_3 = domain.optVarIndices.t(end,:);
+            domain = addConstraint(domain,'Inter-Domain-Nonlinear',...
+                'averageVelocity',3,domain.nNode,...
+                {deps_1,deps_2,deps_3},-5e-4,5e-4,extra);
+            
+            % Swing Foot retraction
+            selected = [1,0,0];
+            if velocity(1) > 0
+                domain = addConstraint(domain,'Nonlinear-Inequality',...
+                    'swingFootVelocity',3,domain.nNode-2:domain.nNode,{{'vFoot'}},-5,0,selected);
+            elseif velocity(1) < 0
+                domain = addConstraint(domain,'Nonlinear-Inequality',...
+                    'swingFootVelocity',3,domain.nNode-2:domain.nNode,{{'vFoot'}},0,5,selected);
+            end
+            domains{i} = domain;
         end
     end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
