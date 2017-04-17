@@ -95,7 +95,7 @@ toc
 %% Animation
 positions_function = @positions;
 
-t_log = [linspace(0,outputs{1}.t(end),length(outputs{1}.t)), outputs{1}.t(end) + linspace(0,outputs{2}.t(end),length(outputs{2}.t)), outputs{2}.t(end) + outputs{2}.t(end) + linspace(0,outputs{3}.t(end),length(outputs{3}.t))];
+t_log = [linspace(0,outputs{1}.t(end),length(outputs{1}.t)), outputs{1}.t(end) + linspace(0,outputs{2}.t(end),length(outputs{2}.t)), outputs{1}.t(end) + outputs{2}.t(end) + linspace(0,outputs{3}.t(end),length(outputs{3}.t))];
 q_log = [outputs{1}.q;outputs{2}.q;outputs{3}.q]';
 
 f = figure;

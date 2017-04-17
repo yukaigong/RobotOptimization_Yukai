@@ -65,7 +65,7 @@
         for i=1:obj.nDomain
             domain = domains{i};
             % Average Step Velocity
-            velocity = [0.2,0,0];
+            velocity = [0.8,0,0];
             selected = [1,1,0];
             extra = [velocity, selected];
             deps_1 = domain.optVarIndices.q(1,:);

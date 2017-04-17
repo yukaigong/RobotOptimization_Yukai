@@ -15,9 +15,9 @@ function [obj] = configureConstraints(obj, varargin)
     
     
     %% begin at perturbed velocity, end at desired velocity.
-    load('02ms_1.mat')
+    load('08ms_1.mat')
     x_0   = [outputs{1}.q(1,1:22), outputs{1}.dq(1,1:22)]';
-    load('0ms_1.mat')
+    load('04ms_1.mat')
     x_end = [outputs{1}.q(end,1:22), outputs{1}.dq(end,1:22)]';
     
     selected=ones(2*DOF,1);
