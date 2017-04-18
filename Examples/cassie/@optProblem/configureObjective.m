@@ -3,7 +3,10 @@ function [obj] = configureObjective(obj, varargin)
     %
     % Copyright 2014-2015 Texas A&M University AMBER Lab
     % Author: Ayonga Hereid <ayonga@tamu.edu>
-       
+    
+    gait_type=varargin{1};
+    
+    
     obj.nzmaxCost = 0;
     costInfos = cell(obj.nDomain,1);
     
@@ -27,13 +30,15 @@ function [obj] = configureObjective(obj, varargin)
         obj.domains{i} = addCost(obj.domains{i},'stateCost',...
             {{'q','dq'}}, 1:obj.domains{i}.nNode, extra);
         
-        % Hip Abduction & Yaw Deviation cost
-        desired = zeros(2*DOF,1);
-        weight = zeros(2*DOF,1); weight([8,9,16,17,30,31,38,39]) = [100;100;100;100;10;10;10;10];
-        selected = zeros(2*DOF,1); selected([8,9,16,17,30,31,38,29]) = [1;1;1;1;1;1;1;1];
-        extra = [desired; weight; selected].';
-        obj.domains{i} = addCost(obj.domains{i},'stateCost',...
-            {{'q','dq'}}, 1:obj.domains{i}.nNode, extra);
+        if gait_type == 'forward_periodic'
+            % Hip Abduction & Yaw Deviation cost
+            desired = zeros(2*DOF,1);
+            weight = zeros(2*DOF,1); weight([8,9,16,17,30,31,38,39]) = [100;100;100;100;10;10;10;10];
+            selected = zeros(2*DOF,1); selected([8,9,16,17,30,31,38,29]) = [1;1;1;1;1;1;1;1];
+            extra = [desired; weight; selected].';
+            obj.domains{i} = addCost(obj.domains{i},'stateCost',...
+                {{'q','dq'}}, 1:obj.domains{i}.nNode, extra);
+        end
         
         % configure domain structure
         obj.domains{i} = configObjectiveStructure(obj.domains{i},...

@@ -15,9 +15,9 @@ function [obj] = configureConstraints(obj, varargin)
     
     
     %% begin at perturbed velocity, end at desired velocity.
-    load('08ms_1.mat')
+    load('0ms_1.mat')
     x_0   = [outputs{1}.q(1,1:22), outputs{1}.dq(1,1:22)]';
-    load('04ms_1.mat')
+    load('0ms_1.mat')
     x_end = [outputs{1}.q(end,1:22), outputs{1}.dq(end,1:22)]';
     
     selected=ones(2*DOF,1);
@@ -56,6 +56,8 @@ function [obj] = configureConstraints(obj, varargin)
     end
 
     % register constraints
+    
+    
     for i=1:obj.nDomain
         domain = domains{i};
         
@@ -145,7 +147,7 @@ function [obj] = configureConstraints(obj, varargin)
         domain = addConstraint(domain,'Nonlinear-Inequality',...
             'footWidth',2,1:domain.nNode,{{'pFoot'}},0.25, 0.3);
 
-%         % Ground Height Foot Clearance
+        % Ground Height Foot Clearance
 %         domain = addConstraint(domain,'Nonlinear-Inequality',...
 %             'guard_groundHeight',2,1:domain.nNode,{{'pFoot'}},-5e-4,Inf,groundHeight);
         

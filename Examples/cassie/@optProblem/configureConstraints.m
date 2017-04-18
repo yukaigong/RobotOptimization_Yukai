@@ -3,17 +3,17 @@
     %
     % Copyright 2014-2015 Texas A&M University AMBER Lab
     % Author: Ayonga Hereid <ayonga@tamu.edu>
-    opt_gait='forward_periodic';
-    switch lower(opt_gait)  
+    gait_type=varargin{1};
+    switch lower(gait_type)  
         case {'forward_periodic'}
             periodic=1;
             forward_periodic=1;
             lateral=0;
             transient=0;
-        case {'lateral_transient'}
-            periocid=1;
+        case {'lateral_periodic'}
+            periodic=1;
             forward_periodic=0;
-            lateral=1;
+            lateral_periodic=1;
             transient=0;
     end
     %     if opt_gait=='forward_periodic'
@@ -64,8 +64,9 @@
         
         for i=1:obj.nDomain
             domain = domains{i};
+            
             % Average Step Velocity
-            velocity = [0.8,0,0];
+            velocity = [1,0,0];
             selected = [1,1,0];
             extra = [velocity, selected];
             deps_1 = domain.optVarIndices.q(1,:);
@@ -84,7 +85,42 @@
                 domain = addConstraint(domain,'Nonlinear-Inequality',...
                     'swingFootVelocity',3,domain.nNode-2:domain.nNode,{{'vFoot'}},0,5,selected);
             end
+            
+            
+            % Foot width (keeps feet from being too close together)
+             domain = addConstraint(domain,'Nonlinear-Inequality',...
+            'footWidth',2,1:domain.nNode,{{'pFoot'}},0.25, 0.3);
+            
+        
+        
             domains{i} = domain;
+        end
+    end
+    if lateral_periodic == 1
+       % Average Step Velocity (2 steps)
+            velocity = [0,0.2,0];
+            selected = [1,1,0];
+            extra = [velocity, selected];
+            deps_1 = domains{1}.optVarIndices.q(1,:);
+            deps_2 = domains{end}.optVarIndices.q(end,:);
+            deps_3 = domains{1}.optVarIndices.t(1,:);
+            deps_4 = domains{end}.optVarIndices.t(end,:);
+            domains{end} = addConstraint(domains{end},'Inter-Domain-Nonlinear',...
+                'averageVelocity2steps',3,domains{end}.nNode,...
+                {deps_1,deps_2,deps_3,deps_4},-5e-4,5e-4,extra);
+            
+        for i=1:obj.nDomain
+            domain = domains{i};
+         
+            % Foot Length
+             domain = addConstraint(domain,'Nonlinear-Inequality',...
+            'footLength',1,domain.nNode,{{'pFoot'}},-5e-4,5e-4);
+        
+            % Foot width (keeps feet from being too close together)
+             domain = addConstraint(domain,'Nonlinear-Inequality',...
+            'footWidth',2,1:domain.nNode,{{'pFoot'}},0.1, inf);
+        
+             domains{i} = domain;
         end
     end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -187,27 +223,13 @@
         domain = addConstraint(domain,'Inter-Domain-Nonlinear',...
             'halfwayStepLength',3,domain.nNode,{deps_1,deps_2,deps_3},-1e-1,1e-1,extra);
 
-        % Swing Foot Retraction - y
-        selected = [1,0,0];
-        if velocity(1) > 0
-            domain = addConstraint(domain,'Nonlinear-Inequality',...
-                'swingFootVelocity',3,domain.nNode-2:domain.nNode,{{'vFoot'}},-5,0,selected);
-        elseif velocity(1) < 0
-            domain = addConstraint(domain,'Nonlinear-Inequality',...
-                'swingFootVelocity',3,domain.nNode-2:domain.nNode,{{'vFoot'}},0,5,selected);
-        end
 
         % Base to stanceFoot height (we don't want knees extended too much)
         domain = addConstraint(domain,'Nonlinear-Inequality',...
             'base2stanceHeight',1,1:domain.nNode,{{'q','pFoot'}},0.5, 1.0);
-
-        % Foot width (keeps feet from being too close together)
-        domain = addConstraint(domain,'Nonlinear-Inequality',...
-            'footWidth',2,1:domain.nNode,{{'pFoot'}},0.25, 0.3);
-
-        %         % Ground Height Foot Clearance
-        %         domain = addConstraint(domain,'Nonlinear-Inequality',...
-        %             'guard_groundHeight',2,1:domain.nNode,{{'pFoot'}},-5e-4,Inf,groundHeight);
+        % Ground Height Foot Clearance
+%         domain = addConstraint(domain,'Nonlinear-Inequality',...
+%             'guard_groundHeight',2,1:domain.nNode,{{'pFoot'}},-5e-4,Inf,groundHeight);
 
         % Mid Foot Clearance
         footClearance = 0.15;

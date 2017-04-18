@@ -28,6 +28,7 @@ x1 = [q1;dq1];
 x2 = [q2;dq2];
 pFoot = sym('pFoot',[12,1]);
 vFoot = sym('vFoot',[12,1]);
+
 Fe = sym('Fe',[nHolonomicConstraints,1]);
 
 %% Holonomic constraint symbolic
@@ -235,6 +236,23 @@ symbolicToFunction('J_averageVelocity_RightStance', {vars,extra}, {J_constraint}
 symbolicToFunction('f_averageVelocity_LeftStance', {vars,extra}, {constraint}, OPT_PATH)
 symbolicToFunction('J_averageVelocity_LeftStance', {vars,extra}, {J_constraint}, OPT_PATH)
 
+% Average Velocity 2 steps
+
+syms T1 T2
+selected = sym('s',[3,1]);
+velocity = sym('v',[3,1]);
+constraint = selected.*((q2(1:3)-q1(1:3))./(T1+T2) - velocity);
+vars = [q1; q2; T1; T2].';
+extra = [velocity; selected].';
+
+J_constraint = jacobian(constraint,vars);
+symbolicToFunction('f_averageVelocity2steps_RightStance', {vars,extra}, {constraint}, OPT_PATH)
+symbolicToFunction('J_averageVelocity2steps_RightStance', {vars,extra}, {J_constraint}, OPT_PATH)
+symbolicToFunction('f_averageVelocity2steps_LeftStance', {vars,extra}, {constraint}, OPT_PATH)
+symbolicToFunction('J_averageVelocity2steps_LeftStance', {vars,extra}, {J_constraint}, OPT_PATH)
+
+
+
 % Swing Foot Velocity
 selected = sym('s',[3,1]);
 constraint = selected.*vFoot(7:9);
@@ -316,6 +334,15 @@ symbolicToFunction('f_footWidth_RightStance', {vars}, {constraint}, OPT_PATH)
 symbolicToFunction('J_footWidth_RightStance', {vars}, {J_constraint}, OPT_PATH)
 symbolicToFunction('f_footWidth_LeftStance', {vars}, {constraint}, OPT_PATH)
 symbolicToFunction('J_footWidth_LeftStance', {vars}, {J_constraint}, OPT_PATH)
+
+% Foot length constraint
+constraint = pFoot(7) - pFoot(1);
+vars = [pFoot].';
+J_constraint = jacobian(constraint,vars);
+symbolicToFunction('f_footLength_RightStance', {vars}, {constraint}, OPT_PATH)
+symbolicToFunction('J_footLength_RightStance', {vars}, {J_constraint}, OPT_PATH)
+symbolicToFunction('f_footLength_LeftStance', {vars}, {constraint}, OPT_PATH)
+symbolicToFunction('J_footLength_LeftStance', {vars}, {J_constraint}, OPT_PATH)
 
 % Height of robot (base - stanceFoot)
 constraint = q(3) - pFoot(3);

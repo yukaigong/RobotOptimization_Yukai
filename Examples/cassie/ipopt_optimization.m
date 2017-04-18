@@ -1,10 +1,12 @@
-%% Direct Collocation Based Optimization
+ %% Direct Collocation Based Optimization
 restoredefaultpath;
 clear; close all; clc;
 MODEL_PATH = '..\..\..\Model-Generator\models\cassie';
 IPOPT_PATH = '..\..\..\lib\ipopt';
 set_paths(MODEL_PATH,IPOPT_PATH);
 addpath(genpath('..\..\..\RobotAnimator'))
+
+gait_type='lateral_periodic';
 
 % Load optimization problem
 optName = 'cassie'
@@ -21,14 +23,19 @@ opt = genBoundaries(opt);
 opt = generateZ0(opt); 
 
 % add constraints
-opt = configureConstraints(opt);
+opt = configureConstraints(opt,gait_type);
 
 % add cost function
-opt = configureObjective(opt);
+opt = configureObjective(opt,gait_type);
 
 % Get Initial Condition
 x0 = opt.Z0;
 old = load('x0'); x0 = old.x;% + 0.01*rand(size(old.x));
+
+if gait_type=='lateral_periodic'
+    x0 = opt.Z0;
+    old = load('L02ms_proto_2'); x0 = old.x;
+end
 
 %% Solve Optimization Problem
 debugMode = false;
@@ -110,4 +117,8 @@ anim.Animate(true);
 % %% Get played trajectory
 % [q_all, t_all] = anim.ReturnTrajectory();
 
-
+%% 
+t_log = linspace(0,10,1000);
+for i=1:length(t_log)
+    q_log(:,i) = anim.GetData(t_log(i));
+end
